@@ -1,4 +1,5 @@
 %include    'stdlib.asm'
+%include    'cardtype.asm'
 
 SECTION     .data
 inp_msg     db      'Enter card number: ', 0h
@@ -30,6 +31,7 @@ _start:                         ; Program entry point
         pop     eax             ; Restore buffer address
         cmp     edx,    12      ; Check for atleast 12 digits
         jb      .err_dig        ; Jump to error if not the digits are not 12 atleast
+        call    detect_card_type; Detect and print card type
         jmp     .exit           ; Exit on success
 
 .err_dig:                       ; Error state for wrong digit count
