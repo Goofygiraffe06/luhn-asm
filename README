@@ -1,0 +1,106 @@
+luhn-asm: A pure no deps implementation of Luhn's algo in x86-32 assembly
+
+Description:
+
+This project consists of assembly language programs designed to validate credit
+card numbers using the Luhn algorithm and to detect the type of credit card
+based on the card's prefix digits. The programs are written for a 32-bit x86
+architecture and are intended to be compiled and run on a Linux operating
+system.
+
+Files:
+
+1.  cardtype.asm:
+    * Implements the credit card type detection logic.
+    * Defines a jump table to efficiently direct execution based on the
+        first digit of the card number.
+    * Provides routines to identify Visa, MasterCard, American Express, and
+        Discover cards.
+    * Handles cases where the card type is unknown.
+
+2.  luhn.asm:
+    * Implements the Luhn algorithm for credit card number validation.
+    * Accepts input from either command-line arguments or standard input.
+    * Validates the input length and reports errors for insufficient digits.
+    * Calls the card type detection routine to identify the card.
+    * Calculates the Luhn checksum and determines the validity of the card.
+    * Provides appropriate output messages for valid and invalid cards.
+
+3.  stdlib.asm:
+    * Provides a library of standard functions used by the main programs.
+    * Includes functions for string length calculation (slen), string printing
+        (sprint, sprintl), integer printing (iprint, iprintl), ASCII to integer
+        conversion (atoi), and program exit (exit).
+    * These functions facilitate input/output and data manipulation.
+
+Compilation and Execution:
+
+1.  Assemble the assembly files using NASM:
+
+    nasm -f elf luhn.asm
+    nasm -f elf cardtype.asm
+    nasm -f elf stdlib.asm
+
+2.  Link the object files using LD:
+
+    ld -m elf_i386 -o luhn luhn.o cardtype.o stdlib.o
+
+3.  Execute the program:
+
+    * Using command-line arguments:
+
+        ./luhn <card_number>
+
+    * Using standard input:
+
+        ./luhn
+
+        (The program will prompt for the card number.)
+
+Technical Details:
+
+* The card type detection routine uses a jump table to efficiently dispatch
+    execution based on the first digit of the card number. This approach
+    minimizes conditional branching and improves performance.
+* The Luhn algorithm is implemented using bitwise operations and arithmetic
+    instructions to calculate the checksum. The program iterates through the
+    digits of the card number, doubles every other digit, and calculates the
+    sum of the digits.
+* The stdlib.asm file provides essential functions for input/output and data
+    conversion. These functions are implemented using system calls to interact
+    with the Linux kernel.
+* Register usage:
+    * `eax`: Accumulator, used for function return values and system call
+        numbers.
+    * `ebx`: Base register, used for memory addressing and file descriptors.
+    * `ecx`: Counter register, used for loop counters and string lengths.
+    * `edx`: Data register, used for data storage and system call arguments.
+    * `esi`: Source index register, used for string manipulation.
+    * `edi`: Destination index register (not extensively used here).
+    * `ebp`: Base pointer, used for stack frame management.
+    * `esp`: Stack pointer.
+* System calls:
+    * `SYS_READ` (3): Reads data from a file descriptor.
+    * `SYS_WRITE` (4): Writes data to a file descriptor.
+    * `SYS_EXIT` (1): Terminates the program.
+* Data representation:
+    * Card numbers are treated as ASCII strings.
+    * Digits are converted to integers by subtracting the ASCII value of '0'
+        (48).
+    * Results and messages are stored as null-terminated strings.
+
+Error Handling:
+
+* The program validates the input length and reports an error if the card
+    number contains fewer than 12 digits.
+* The card type detection routine handles cases where the card type is
+    unknown.
+* The Luhn algorithm reports an error if the checksum is not divisible by 10.
+
+Limitations:
+
+* The program is designed for 32-bit x86 Linux.
+* It assumes that the input card number contains only digits.
+* It does not perform any network validation or check for card expiration.
+
+Author: Goofygiraffe06
