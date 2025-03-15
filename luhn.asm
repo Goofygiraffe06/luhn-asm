@@ -9,8 +9,8 @@ inv_msg     db      'Card number is invalid', 0h                      ; Invalid 
 luhn_db     db      0, 2, 4, 6, 8, 1, 3, 5, 7, 9                      ; Lookup table for doubled digits
 
 SECTION     .bss
-inp_buff    resb    76          ; Reserve 76 bytes for input buffer
-                                ; Credit card: 19 digits * 4 bytes = 76 bytes
+inp_buff    resb    20          ; Reserve 20 bytes for input buffer
+                                ; Credit card: 19 digits * newline = 20 bytes
 
 SECTION     .text
 global      _start
@@ -115,7 +115,7 @@ _start:                         ; Program entry point
         call    iprintl         ; Print the digit count
         pop     ebx
         pop     ebp
-        pop     eax, 1
+        mov     eax, 1
         mov     ebx, 1
         int     80h
 
