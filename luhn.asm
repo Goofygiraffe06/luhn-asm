@@ -10,7 +10,7 @@ luhn_db     db      0, 2, 4, 6, 8, 1, 3, 5, 7, 9                      ; Lookup t
 
 SECTION     .bss
 inp_buff    resb    20          ; Reserve 20 bytes for input buffer
-                                ; Credit card: 19 digits * newline = 20 bytes
+                                ; Credit card: 19 digits + newline = 20 bytes
 
 SECTION     .text
 global      _start
