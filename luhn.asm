@@ -4,8 +4,8 @@
 SECTION     .data
 inp_msg     db      'Enter card number: ', 0h
 err_dig     db      '[Error] Must enter at least 12 digits. Received: ', 0h  ; Error message for wrong digit count
-val_msg     db      'Card Number is valid', 0Ah, 0h                        ; Valid card message
-inv_msg     db      'Card number is invalid', 0Ah, 0h                      ; Invalid card message
+val_msg     db      'Card Number is valid', 0h                        ; Valid card message
+inv_msg     db      'Card number is invalid', 0h                      ; Invalid card message
 
 SECTION     .bss
 inp_buff    resb    76          ; Reserve 76 bytes for input buffer
@@ -95,6 +95,7 @@ _start:                         ; Program entry point
 .valid:
         mov     eax,    val_msg
         call    sprintl         ; Print the valid card message
+        xor     ebx,    ebx     ; Return with status code 0
         jmp     .exit
 
 .invalid:
@@ -115,3 +116,4 @@ _start:                         ; Program entry point
         pop     edx             ; Clean up stack (length)
         pop     ebp             ; Restore ebp
         call    exit            ; Terminate program
+
