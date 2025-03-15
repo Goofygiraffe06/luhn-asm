@@ -6,6 +6,7 @@ inp_msg     db      'Enter card number: ', 0h
 err_dig     db      '[Error] Must enter at least 12 digits. Received: ', 0h  ; Error message for wrong digit count
 val_msg     db      'Card Number is valid', 0h                        ; Valid card message
 inv_msg     db      'Card number is invalid', 0h                      ; Invalid card message
+luhn_db     db      0, 2, 4, 6, 8, 1, 3, 5, 7, 9                      ; Lookup table for doubled digits
 
 SECTION     .bss
 inp_buff    resb    76          ; Reserve 76 bytes for input buffer
@@ -66,13 +67,8 @@ _start:                         ; Program entry point
         sub     eax,    '0'     ; Convert ASCII to integer
         test    ecx,    1       ; Check if position is odd from right (1, 3, 5...)
         jz      .add_digit      ; If odd, skip doubling
-        shl     eax,    1       ; Double the digit (even pos from right)
-        cmp     eax,    9       ; Check if doubled > 9
-        jle     .add_doubled    ; If <= 9, add as is
-        sub     eax,    9       ; If > 9, subtract 9
-
-.add_doubled:
-        add     edx,    eax     ; Add doubled (or adjusted) digit to sum
+        movzx   eax,    byte [luhn_db + eax] ; Lookup doubled value
+        add     edx,    eax     ; Add the digit and store it in edx register     
         jmp     .next_digit
 
 .add_digit:
