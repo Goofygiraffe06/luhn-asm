@@ -83,7 +83,7 @@ _start:                         ; Program entry point
         mov     eax,    edx     ; Move sum to eax
         mov     ebx,    10      ; Divisor
         xor     edx,    edx     ; Clear edx for idiv
-        idiv    ebx             ; edx = (sum % 10)
+        div    ebx              ; edx = (sum % 10)
         test    edx,    edx     ; Check if remainder is 0
         jnz     .invalid        ; If not 0, invalid
         jmp     .valid          ; If 0, valid
