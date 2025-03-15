@@ -75,27 +75,27 @@ detect_card_type:                   ; Card type detection module
 
 .visa:                              ; Visa card type
         mov     eax,    visa_msg    ; Load message address
-        call    sprintl             ; Print with newline
+        call    sprint              ; Print with newline
         jmp     .done
 
 .mastercard:                        ; MasterCard type
         mov     eax,    mc_msg
-        call    sprintl
+        call    sprint
         jmp     .done
 
 .amex:                              ; American Express type
         mov     eax,    amex_msg
-        call    sprintl
+        call    sprint
         jmp     .done
 
 .discover:                          ; Discover type
         mov     eax,    disc_msg
-        call    sprintl
+        call    sprint
         jmp     .done
 
 .unknown:                           ; Unknown card type
         mov     eax,    unk_msg
-        call    sprintl
+        call    sprint
         jmp     .done
 
 .done:                              ; Cleanup and return

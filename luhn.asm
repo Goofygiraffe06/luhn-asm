@@ -4,8 +4,8 @@
 SECTION     .data
 inp_msg     db      'Enter card number: ', 0h
 err_dig     db      '[Error] Must enter at least 12 digits. Received: ', 0h  ; Error message for wrong digit count
-val_msg     db      'Card Number is valid', 0Ah, 0h                         ; Valid card message
-inv_msg     db      'Card number is invalid', 0Ah, 0h                       ; Invalid card message
+val_msg     db      'Card Number is valid', 0Ah, 0h                        ; Valid card message
+inv_msg     db      'Card number is invalid', 0Ah, 0h                      ; Invalid card message
 
 SECTION     .bss
 inp_buff    resb    76          ; Reserve 76 bytes for input buffer
@@ -15,6 +15,22 @@ SECTION     .text
 global      _start
 
 _start:                         ; Program entry point
+        push    ebp             ; Save ebp
+        mov     ebp,    esp     ; Set up stack frame
+        push    ebx             ; Save ebx for safety
+
+        mov     eax,    [ebp + 4] ; Load argc (esp + 4 due to push ebp)
+        cmp     eax,    2       ; Check if at least 2 args (program name + card number)
+        jb      .stdin_input    ; If less than 2, use STDIN input
+
+        ; Use command-line argument
+        mov     eax,    [ebp + 12] ; Load address of argv[1] (esp + 12 due to pushes)
+        call    slen            ; Count digits (should return 16)
+        mov     edx,    eax     ; Move slen result to edx (digit count)
+        push    edx             ; Save length on stack
+        jmp     .process_input  ; Skip STDIN block
+
+.stdin_input:
         mov     eax,    inp_msg ; Load address of input message
         call    sprint          ; Print prompt to user
         mov     edx,    76      ; Set buffer size for SYS_READ (match bss)
@@ -29,13 +45,15 @@ _start:                         ; Program entry point
         call    slen            ; Count digits (should return 16)
         mov     edx,    eax     ; Move slen result to edx (digit count)
         push    edx             ; Save length on stack
+
+.process_input:
         cmp     edx,    12      ; Check for at least 12 digits
         jb      .err_dig        ; Jump to error if < 12
-        mov     eax,    inp_buff; Get the address from the stack
+        mov     eax,    [ebp + 12] ; Get the address from the stack (argv[1] or inp_buff)
         call    detect_card_type; Detect and print card type (eax = inp_buff)
 
         ; Core Luhn's algorithm
-        mov     esi,    inp_buff; Load input buffer address
+        mov     esi,    [ebp + 12] ; Load input buffer address
         add     esi,    edx     ; Move to end of digits (edx = length)
         dec     esi             ; Point to last digit
         xor     ecx,    ecx     ; Counter for digit position
@@ -47,7 +65,7 @@ _start:                         ; Program entry point
         movzx   eax,    byte [esi]  ; Load current digit (ASCII)
         sub     eax,    '0'     ; Convert ASCII to integer
         test    ecx,    1       ; Check if position is odd from right (1, 3, 5...)
-        jz     .add_digit      ; If odd, skip doubling
+        jz      .add_digit      ; If odd, skip doubling
         shl     eax,    1       ; Double the digit (even pos from right)
         cmp     eax,    9       ; Check if doubled > 9
         jle     .add_doubled    ; If <= 9, add as is
@@ -82,6 +100,7 @@ _start:                         ; Program entry point
 .invalid:
         mov     eax,    inv_msg
         call    sprintl         ; Print the invalid card message
+        mov     ebx,    1       ; Return with status code 1 if its invalid
         jmp     .exit
 
 .err_dig:                       ; Error state for wrong digit count
@@ -94,5 +113,5 @@ _start:                         ; Program entry point
 
 .exit:                          ; Clean exit
         pop     edx             ; Clean up stack (length)
-        mov     ebx,    0       ; Set return code
+        pop     ebp             ; Restore ebp
         call    exit            ; Terminate program
