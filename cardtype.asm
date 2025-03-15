@@ -7,7 +7,7 @@ unk_msg     db      'Card type: Unknown', 0Ah, 0h        ; Unknown type message
 
 SECTION     .text
 
-detect_card_type:                   ; Card type detection module (non-global)
+detect_card_type:                   ; Card type detection module
         push    eax                 ; Preserve registers
         push    ebx                 ; Save buffer pointer
 
