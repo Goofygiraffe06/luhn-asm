@@ -2,11 +2,11 @@
 
 SECTION     .data
 inp_msg     db      'Enter card number: ', 0h
-err_dig     db      '[Error] Must enter exactly 16 digits. Received: ', 0h  ; Error message for wrong digit count
+err_dig     db      '[Error] Must enter atleast 12 digits. Received: ', 0h  ; Error message for wrong digit count
 
 SECTION     .bss
-inp_buff    resb    64          ; Reserve 64 bytes for input buffer
-                                ; Credit card: 16 digits * 4 bytes = 64 bytes
+inp_buff    resb    76          ; Reserve 76 bytes for input buffer
+                                ; Credit card: 19 digits * 4 bytes = 76 bytes
 
 SECTION     .text
 global      _start
@@ -28,8 +28,8 @@ _start:                         ; Program entry point
         call    slen            ; Count digits, should be 16
         mov     edx,    eax     ; Move slen result to edx
         pop     eax             ; Restore buffer address
-        cmp     edx,    16      ; Check if exactly 16 digits
-        jne     .err_dig        ; Jump to error if not 16
+        cmp     edx,    12      ; Check for atleast 12 digits
+        jb      .err_dig        ; Jump to error if not the digits are not 12 atleast
         jmp     .exit           ; Exit on success
 
 .err_dig:                       ; Error state for wrong digit count
