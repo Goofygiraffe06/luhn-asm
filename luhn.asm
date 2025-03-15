@@ -92,13 +92,20 @@ _start:                         ; Program entry point
         mov     eax,    val_msg
         call    sprintl         ; Print the valid card message
         xor     ebx,    ebx     ; Return with status code 0
-        jmp     .exit
+        pop     edx
+        pop     ebx
+        pop     ebp
+        mov     eax, 1
+        int     80h
 
 .invalid:
         mov     eax,    inv_msg
         call    sprintl         ; Print the invalid card message
         mov     ebx,    1       ; Return with status code 1 if its invalid
-        jmp     .exit
+        pop     edx
+        pop     ebp
+        mov     eax, 1
+        int     80h
 
 .err_dig:                       ; Error state for wrong digit count
         pop     edx             ; Restore digit count from stack
@@ -106,10 +113,9 @@ _start:                         ; Program entry point
         call    sprint          ; Print error message
         mov     eax,    edx     ; Load digit count for printing
         call    iprintl         ; Print the digit count
-        jmp     .exit           ; Exit after error
-
-.exit:                          ; Clean exit
-        pop     edx             ; Clean up stack (length)
-        pop     ebp             ; Restore ebp
-        call    exit            ; Terminate program
+        pop     ebx
+        pop     ebp
+        pop     eax, 1
+        mov     ebx, 1
+        int     80h
 
